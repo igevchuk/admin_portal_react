@@ -13,6 +13,9 @@ import {
 } from "@jss/dashboardStyle";
 
 const sidebarStyle = theme => ({
+  sidebar: {
+    flexGrow: 1
+  },
   drawerPaper: {
     border: "none",
     position: "fixed",

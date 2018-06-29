@@ -1,9 +1,6 @@
 import Loadable from 'react-loadable';
 
 import Loading from '@components/Loading';
-import Editor from '@views/editor/Editor';
-import Notifications from '@views/notifications/Notifications';
-import DashboardBuilder from '@views/builder/DashboardBuilder';
 
 const AsyncHome = Loadable({ 
   loader: () => import('@views/home/Home'),
@@ -31,7 +28,7 @@ const dashboardRoutes = [
   {
     path: "/contract",
     exact: true,
-    protected: true,
+    // protected: true,
     displayLink: true,
     label: "Contract Templates",
     icon: 'src/assets/images/sidebar/contract-icon.png',
@@ -41,7 +38,7 @@ const dashboardRoutes = [
   {
     exact: true,
     path: "/users",
-    protected: true,
+    // protected: true,
     displayLink: true,
     label: "Users",
     icon: 'src/assets/images/sidebar/user-icon.png',

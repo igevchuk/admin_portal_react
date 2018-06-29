@@ -4,7 +4,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { NavLink } from 'react-router-dom';
 
-import './Sidebar.scss';
 import sidebarStyle from '@jss/components/sidebarStyle';
 
 const Sidebar = ({ ...props }) => {

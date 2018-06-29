@@ -1,54 +1,23 @@
 import {
-  warningColor,
-  primaryColor,
-  dangerColor,
-  successColor,
-  infoColor,
-  roseColor,
-  grayColor,
   defaultFont
-} from "./../../assets/jss/dashboardStyle.jsx";
+} from "@jss/dashboardStyle.jsx";
 
 const tableStyle = theme => ({
-  warningTableHeader: {
-    color: warningColor
-  },
-  primaryTableHeader: {
-    color: primaryColor
-  },
-  dangerTableHeader: {
-    color: dangerColor
-  },
-  successTableHeader: {
-    color: successColor
-  },
-  infoTableHeader: {
-    color: infoColor
-  },
-  roseTableHeader: {
-    color: roseColor
-  },
-  grayTableHeader: {
-    color: grayColor
-  },
-  table: {
-    marginBottom: "0",
-    width: "100%",
-    maxWidth: "100%",
-    backgroundColor: "transparent",
-    borderSpacing: "0",
-    borderCollapse: "collapse"
-  },
   tableHeadCell: {
-    color: "inherit",
     ...defaultFont,
-    fontSize: "1em"
+    color: "#757575",
+    fontSize: "12px",
+    textAlign: "left"
   },
   tableCell: {
     ...defaultFont,
     lineHeight: "1.42857143",
     padding: "12px 8px",
-    verticalAlign: "middle"
+    verticalAlign: "left",
+    "&:first-child, &:last-child": {
+      paddingLeft: "24px",
+      paddingRight: "24px"
+    }
   },
   tableResponsive: {
     width: "100%",

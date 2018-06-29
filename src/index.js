@@ -11,7 +11,7 @@ import routes from '@routes/dashboard';
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 
-import App from './layouts/App';
+import App from './layouts/App.jsx';
 
 const createStoreWithMiddleware = applyMiddleware(
   reduxThunk
