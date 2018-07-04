@@ -49,7 +49,8 @@ module.exports = {
       "@routes": path.resolve(__dirname, "src/routes/"),
       "@assets": path.resolve(__dirname, "src/assets/"),
       "@jss": path.resolve(__dirname, "src/assets/jss/"),
-      "@images": path.resolve(__dirname, "src/assets/images/")
+      "@images": path.resolve(__dirname, "src/assets/images/"),
+      "@actions": path.resolve(__dirname, "src/actions")
     }
   },
   devServer: {

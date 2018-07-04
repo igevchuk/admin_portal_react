@@ -45,7 +45,7 @@ import tableStyle from "./tableStyle";
 
 function CustomTable({ ...props }) {
   const { classes, tableCols, tableData } = props;
-  
+  console.log(123,tableData)
   return (
     <Table>
       {
@@ -67,13 +67,22 @@ function CustomTable({ ...props }) {
         {tableData.map((prop, key) => {
           return (
             <TableRow key={key}>
-              {prop.map((prop, key) => {
+              {/* {prop.map((prop, key) => {
                 return (
                   <TableCell className={classes.tableCell} key={key}>
                     {prop}
                   </TableCell>
                 );
-              })}
+              })} */}
+              <TableCell className={classes.tableCell}>
+                {prop.name}
+              </TableCell>
+              <TableCell className={classes.tableCell}>
+                {prop.email}
+              </TableCell>
+              <TableCell className={classes.tableCell}>
+                {prop.phone}
+              </TableCell>
             </TableRow>
           );
         })}
@@ -98,7 +107,7 @@ CustomTable.propTypes = {
     "gray"
   ]),
   tableHead: PropTypes.arrayOf(PropTypes.string),
-  tableData: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string))
+  tableData: PropTypes.arrayOf(PropTypes.object)
 };
 
 export default withStyles(tableStyle)(CustomTable);

@@ -1,6 +1,10 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import * as usersActions from "@actions/usersActions";
+import PropTypes from "prop-types";
 import faker from "faker";
-import styled, { extend } from "styled-components";
+import styled from "styled-components";
 import { Paper } from "@material-ui/core";
 import Container from "@components/Container/Container";
 import Table from "@components/Table/Table";
@@ -48,6 +52,7 @@ class Users extends Component {
   }
 
   componentDidMount() {
+    this.props.usersActions.fetchUsers();
     Promise.resolve(this.getUsers()).then(res => {
       this.setState({
         userList: res
@@ -122,7 +127,8 @@ class Users extends Component {
   }
 
   render() {
-    const { user } = this.state;
+    const { users } = this.props;
+    console.log(this.state)
     return (
       <UsersContainer>
         <Title>Users</Title>
@@ -135,10 +141,14 @@ class Users extends Component {
         </Toolbar>
 
         <Paper>
-          <Table
-            tableCols={["Name", "Email", "Role"]}
-            tableData={this.state.userList}
-          />
+          {
+            !!users && users.length > 0 && (
+              <Table
+                tableCols={[ "Name", "Email", "Role" ]}
+                tableData={users}
+              />
+            )
+          }
         </Paper>
 
         {this.getUserFormDialog()}
@@ -147,4 +157,21 @@ class Users extends Component {
   }
 }
 
-export default Users;
+Users.propTypes = {
+  usersActions: PropTypes.object,
+  users: PropTypes.array
+};
+
+const mapStateToProps = (state) => {
+  return {
+    users: state.users
+  };
+};
+const mapDispatchProps = dispatch => {
+  return { usersActions: bindActionCreators(usersActions, dispatch) };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchProps
+)(Users);
