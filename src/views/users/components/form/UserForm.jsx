@@ -30,6 +30,14 @@ const StyledSecondaryButton = styled(SecondaryButton)`
   }
 `;
 
+const StyledTextField = styled(TextField)`
+  & label,
+  input {
+    font-size: ${props => props.theme.baseFontSize};
+  }
+  color: ${props => props.theme.brandGrey};
+`;
+
 class UserForm extends Component {
   constructor(props) {
     super(props);
@@ -53,17 +61,27 @@ class UserForm extends Component {
 
     return (
       <form className="user-form" autoComplete="off">
-        <TextField
+        <StyledTextField
           autoFocus
           margin="dense"
-          id="name"
-          label="Name"
+          id="first_name"
+          label="First Name"
           type="text"
-          onChange={e => this.updateFormData("name", e.target.value)}
+          onChange={e => this.updateFormData("first_name", e.target.value)}
           fullWidth
         />
 
-        <TextField
+        <StyledTextField
+          autoFocus
+          margin="dense"
+          id="last_name"
+          label="Last Name"
+          type="text"
+          onChange={e => this.updateFormData("last_name", e.target.value)}
+          fullWidth
+        />
+
+        <StyledTextField
           autoFocus
           margin="dense"
           id="name"
@@ -73,7 +91,7 @@ class UserForm extends Component {
           fullWidth
         />
 
-        <StyledFormControl className="user-form_control">
+        {/* <StyledFormControl className="user-form_control">
           <InputLabel htmlFor="user-role">Role</InputLabel>
           <StyledSelect
             value="Admin"
@@ -86,9 +104,9 @@ class UserForm extends Component {
             </MenuItem>
             <MenuItem value="Editor">Editor</MenuItem>
           </StyledSelect>
-        </StyledFormControl>
+        </StyledFormControl> */}
 
-        {true && (
+        {!!user && (
           <SecondaryButton
             onClick={this.handleClose}
             color="secondary"
@@ -99,11 +117,11 @@ class UserForm extends Component {
         )}
 
         <FormActions>
-          <StyledSecondaryButton onClick={this.props.saveUser}>
+          <StyledSecondaryButton onClick={(e) => this.props.handleCloe}>
             {!!user ? "Update" : "Save"}
           </StyledSecondaryButton>
 
-          <StyledSecondaryButton onClick={this.props.handleClose}>
+          <StyledSecondaryButton onClick={(e) => this.props.handleClose}>
             Cancel
           </StyledSecondaryButton>
         </FormActions>

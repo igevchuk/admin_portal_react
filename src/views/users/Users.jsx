@@ -102,7 +102,8 @@ class Users extends Component {
       users: [],
       listParams: {},
       loading: false,
-      openSelect: false
+      openSelect: false,
+      openDialog: false
     };
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClickClose = this.handleClickClose.bind(this);
@@ -229,7 +230,9 @@ class Users extends Component {
     this.dialog.handleOpen();
   }
 
-  handleClickClose() {
+  handleClickClose(e) {
+    e.preventDefault();
+
     this.dialog.handleClose();
   }
 
@@ -246,7 +249,12 @@ class Users extends Component {
     }
   }
 
-  getUserDetail(id) {}
+  getUserDetail(id = null) {
+    console.log(245736)
+    this.setState({
+      openDialog: true
+    });
+  }
 
   renderUsersList() {
     const { pagination, users } = this.props;
@@ -288,11 +296,7 @@ class Users extends Component {
         open={this.state.openDialog}
         dialogTitle={this.getDialogTitle()}
       >
-        <UserForm
-          handleClose={this.handleClickClose}
-          handleDelete={this.deleteUser.bind(this)}
-          handleSave={this.saveUser.bind(this)}
-        />
+        <UserForm handleClose={this.handleClickClose} />
       </Dialog>
     );
   }
@@ -301,56 +305,41 @@ class Users extends Component {
     const orderingOptions = this.getOrderingOptions();
     const orderingLabel = this.getOrderingLabel();
 
-    return (
-      <UsersContainer>
+    return <UsersContainer>
         <Title>Users</Title>
         <Toolbar>
           <SearchInput onSearch={this.updateListParams.bind(this)} />
 
           <OrderingSelect>
-            <div
-              className={cx("users-order", {
+            <div className={cx("users-order", {
                 active: this.state.openOrderingSelect
-              })}
-            >
+              })}>
               <span className="users-order-label">Sort by:</span>
-              <SecondaryButton
-                className="users-order-button"
-                onClick={() => this.toggleOrderingSelect()}
-              >
+              <SecondaryButton className="users-order-button" onClick={() => this.toggleOrderingSelect()}>
                 {orderingLabel}
               </SecondaryButton>
 
-              <EscapeOutside
-                open={this.state.openOrderingSelect}
-                onClickOutside={this.toggleOrderingSelect.bind(this)}
-              >
+              <EscapeOutside open={this.state.openOrderingSelect} onClickOutside={this.toggleOrderingSelect.bind(this)}>
                 <ul className="users-order-select">
                   {orderingOptions.map(option => {
-                    return (
-                      <li
-                        key={option.key}
-                        onClick={() => this.toggleOrderingSelect(option.key)}
-                      >
+                    return <li key={option.key} onClick={() => this.toggleOrderingSelect(option.key)}>
                         {option.label}
-                      </li>
-                    );
+                      </li>;
                   })}
                 </ul>
               </EscapeOutside>
             </div>
           </OrderingSelect>
 
-          <RaisedButton size="medium" onClick={this.handleClickOpen}>
+          <RaisedButton size="medium" onClick={this.getUserDetail.bind(this)}>
             Create User
           </RaisedButton>
         </Toolbar>
 
         <Paper>{this.renderUsersList()}</Paper>
 
-        {/* {this.getUserFormDialog()} */}
-      </UsersContainer>
-    );
+        {this.getUserFormDialog()}
+      </UsersContainer>;
   }
 }
 
