@@ -1,68 +1,79 @@
-import React from 'react';
-import propTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
-import { NavLink } from 'react-router-dom';
+import React from "react";
+import styled from "styled-components";
+import cx from "classnames";
+import { Drawer } from "@material-ui/core";
 
-import sidebarStyle from '@jss/components/sidebarStyle';
+const List = styled.ul`
+  padding: 8px 0;
+  margin-top: 56px;
+  list-style: none;
+  & > li {
+    padding: 12px 24px;
+    background: #ffffff;
+    transition: background 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    &:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    & a {
+      clear: both;
+      text-decoration: none;
+    }
+    & img {
+      height: 32px;
+      width: auto;
+      float: left;
+      text-align: center;
+      vertical-align: center;
+    }
+    & span {
+      font-size: ${props => props.theme.baseFontSize};
+      color: ${props => props.theme.brandGrey};
+      padding: 0 16px;
+      font-weight: ${props => props.theme.fontLight};
+      line-height: 30px;
+      font-family: ${props => props.theme.fontSans};
+      margin: 0;
+    }
+  }
+  & > li.active {
+    span {
+      color: ${props => props.theme.brandGreen};
+    }
+  }
+`;
 
 const Sidebar = ({ ...props }) => {
   function activeRoute(routeName) {
     return !!~props.location.pathname.indexOf(routeName);
   }
 
-  const { classes, routes } = props;
+  const { routes } = props;
   const links = (
-    <List className={ classes.root }>
-      { routes.map((prop, key) => {
-        if (prop.redirect) 
-          return null;
-        
+    <List className="sidebar">
+      {routes.map((prop, key) => {
+        if (prop.redirect) return null;
+
         let iconSrc = activeRoute(prop.path) ? prop.activeIcon : prop.icon;
         return (
-          <NavLink
-            to={ prop.path }
-            className={ classes.item }
-            activeClassName="active"
-            key={ key }
-          >
-            <ListItem button>
-              <ListItemIcon className={ classes.itemIcon }>
-                <img src={ iconSrc } />
-              </ListItemIcon>
+          <li className={cx({ active: activeRoute(prop.path) })} key={key}>
+            <a href={prop.path}>
+              <img src={iconSrc} />
 
-              <ListItemText
-                className={ classes.itemText }
-                disableTypography={ true }
-              >
-                { prop.label }
-              </ListItemText>
-            </ListItem>
-          </NavLink>
+              <span>{prop.label}</span>
+            </a>
+          </li>
         );
-      }) }
+      })}
     </List>
   );
 
   return (
     <div>
-      <Drawer
-          anchor="left"
-          variant="permanent"
-          open
-          classes={{
-            paper: classes.drawerPaper
-          }}
-        >
-          <div className={ classes }>{ links }</div>
-        </Drawer>
+      <Drawer anchor="left" variant="permanent" open>
+        <div>{links}</div>
+      </Drawer>
     </div>
   );
 };
 
-
-Sidebar.propTypes = {
-  classes: propTypes.object.isRequired
-};
-
-export default withStyles(sidebarStyle)(Sidebar);
+export default Sidebar;

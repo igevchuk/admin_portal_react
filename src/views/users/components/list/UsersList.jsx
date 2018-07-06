@@ -10,8 +10,10 @@ import {
 } from "@material-ui/core";
 
 const UsersList = styled.div`
-  & table tr {
+  & table tbody tr {
     background: #FFFFFF;
+    transition: background 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    cursor: pointer;
     &:hover {
       background: rgba(0, 0, 0, 0.08);
     }

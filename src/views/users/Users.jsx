@@ -80,6 +80,7 @@ const OrderingSelect = styled.div`
       padding: 12px 16px;
       cursor: pointer;
       background: white;
+      transition: background 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
       &:hover {
         background: rgba(0, 0, 0, 0.08);
       }
