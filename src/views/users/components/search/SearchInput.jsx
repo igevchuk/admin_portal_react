@@ -1,13 +1,32 @@
 import React, { Component } from "react";
+import styled from "styled-components";
 import { TextField, InputAdornment } from "@material-ui/core";
 import { Search } from "@material-ui/icons";
 
-class SearchInput extends Component {
+const StyledTextField = styled(TextField)`
+  & > div {
+    align-items: center;
+  }
+  input {
+    font-size: ${props => props.theme.baseFontSize};
+    color: ${props => props.theme.brandGrey};
+    font-weight: ${props => props.theme.fontWeight};
+  }
+  & .search-input_andornment {
+    color: ${props => props.theme.brandGrey};
+    font-size: 12px;
+    & svg {
+      font-size: 20px;
+    }
+  }
+`;
+
+export default class SearchInput extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      query: ''
+      query: ""
     };
     this.handleChange = this.handleChange.bind(this);
   }
@@ -16,25 +35,27 @@ class SearchInput extends Component {
     let query = e.target.value;
 
     this.setState({ query });
-    this.props.onSearch('search', query);
+    this.props.onSearch("search", query);
   }
 
   render() {
-    return ( 
-      <TextField
-        value={ this.state.query }
-        onChange={ this.handleChange }
+    return (
+      <StyledTextField
+        className="search-input"
+        value={this.state.query}
+        onChange={this.handleChange}
         placeholder="Search..."
         InputProps={{
           startAdornment: (
-            <InputAdornment position="start">
+            <InputAdornment
+              position="start"
+              className="search-input_andornment"
+            >
               <Search />
             </InputAdornment>
           )
         }}
       />
-    )
+    );
   }
 }
-
-export default SearchInput;

@@ -14,6 +14,7 @@ import {
   MenuItem,
   FormControl
 } from "@material-ui/core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Container from "@components/Container/Container";
 import UsersList from "./components/list/UsersList";
 import { RaisedButton, SecondaryButton } from "@components/Button/Button";
@@ -23,6 +24,7 @@ import UserForm from "./components/form/UserForm";
 import Loading from "@components/Loading";
 import Waypoint from "react-waypoint";
 import queryString from "query-string";
+import EscapeOutside from "@containers/EscapeOutside";
 
 const UsersContainer = Container.extend`
   width: 960px;
@@ -53,20 +55,20 @@ const OrderingSelect = styled.div`
     position: relative;
     min-width: 200px;
     font-size: 12px;
+    color: ${props => props.theme.brandGrey};
     .users-order-label {
       padding: 8px 12px;
-      text-transform: uppercase;
-      width: 58px;
     }
     .users-order-button {
       display: block;
       min-width: 160px;
+      text-align: left;
     }
   }
   & ul {
     display: none;
     position: absolute;
-    top: 36px;
+    top: 10px;
     right: 0;
     padding: 8px 0;
     list-style: none;
@@ -215,7 +217,7 @@ class Users extends Component {
         id: current.url,
         name: this.getName(current),
         email: current.email,
-        groups: this.getGroups(current),
+        groups: this.getGroups(current)
       });
 
       return accum;
@@ -243,9 +245,7 @@ class Users extends Component {
     }
   }
 
-  getUserDetail(id) {
-    
-  }
+  getUserDetail(id) {}
 
   renderUsersList() {
     const { pagination, users } = this.props;
@@ -320,18 +320,23 @@ class Users extends Component {
                 {orderingLabel}
               </SecondaryButton>
 
-              <ul className="users-order-select">
-                {orderingOptions.map(option => {
-                  return (
-                    <li
-                      key={option.key}
-                      onClick={() => this.toggleOrderingSelect(option.key)}
-                    >
-                      {option.label}
-                    </li>
-                  );
-                })}
-              </ul>
+              <EscapeOutside
+                open={this.state.openOrderingSelect}
+                onClickOutside={this.toggleOrderingSelect.bind(this)}
+              >
+                <ul className="users-order-select">
+                  {orderingOptions.map(option => {
+                    return (
+                      <li
+                        key={option.key}
+                        onClick={() => this.toggleOrderingSelect(option.key)}
+                      >
+                        {option.label}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </EscapeOutside>
             </div>
           </OrderingSelect>
 
@@ -342,7 +347,7 @@ class Users extends Component {
 
         <Paper>{this.renderUsersList()}</Paper>
 
-        {this.getUserFormDialog()}
+        {/* {this.getUserFormDialog()} */}
       </UsersContainer>
     );
   }
