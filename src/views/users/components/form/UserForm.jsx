@@ -67,6 +67,7 @@ class UserForm extends Component {
           id="first_name"
           label="First Name"
           type="text"
+          value={!!user && !!user.first_name ? user.first_name : ""}
           onChange={e => this.updateFormData("first_name", e.target.value)}
           fullWidth
         />
@@ -77,6 +78,7 @@ class UserForm extends Component {
           id="last_name"
           label="Last Name"
           type="text"
+          value={!!user && !!user.last_name ? user.last_name : ""}
           onChange={e => this.updateFormData("last_name", e.target.value)}
           fullWidth
         />
@@ -87,6 +89,7 @@ class UserForm extends Component {
           id="name"
           label="Email"
           type="email"
+          value={!!user && !!user.email ? user.email : ""}
           onChange={e => this.updateFormData("email", e.target.value)}
           fullWidth
         />
@@ -106,7 +109,7 @@ class UserForm extends Component {
           </StyledSelect>
         </StyledFormControl> */}
 
-        {!!user && (
+        {/* {!!user && (
           <SecondaryButton
             onClick={this.handleClose}
             color="secondary"
@@ -114,14 +117,14 @@ class UserForm extends Component {
           >
             Delete User
           </SecondaryButton>
-        )}
+        )} */}
 
         <FormActions>
-          <StyledSecondaryButton onClick={(e) => this.props.handleCloe}>
+          <StyledSecondaryButton onClick={e => this.props.handleCloe}>
             {!!user ? "Update" : "Save"}
           </StyledSecondaryButton>
 
-          <StyledSecondaryButton onClick={(e) => this.props.handleClose}>
+          <StyledSecondaryButton onClick={e => this.props.handleClose}>
             Cancel
           </StyledSecondaryButton>
         </FormActions>

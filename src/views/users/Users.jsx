@@ -2,6 +2,8 @@ import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as usersActions from "@actions/usersActions";
+import * as userActions from "@actions/userActions";
+
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import _ from "lodash";
@@ -237,8 +239,8 @@ class Users extends Component {
   }
 
   getDialogTitle() {
-    const { user } = this.state;
-    return !!user ? `Edit User: ${user.name}` : `Create New User`;
+    const { user } = this.props;
+    return !!user ? `Edit User: ${this.getName(user)}` : `Create New User`;
   }
 
   onPaginate() {
@@ -250,7 +252,9 @@ class Users extends Component {
   }
 
   getUserDetail(id = null) {
-    console.log(245736)
+    if (!!id) {
+      this.props.userActions.fetchUser(id);
+    }
     this.setState({
       openDialog: true
     });
@@ -296,7 +300,7 @@ class Users extends Component {
         open={this.state.openDialog}
         dialogTitle={this.getDialogTitle()}
       >
-        <UserForm handleClose={this.handleClickClose} />
+        <UserForm handleClose={this.handleClickClose} user={this.props.user}/>
       </Dialog>
     );
   }
@@ -346,18 +350,22 @@ class Users extends Component {
 Users.propTypes = {
   usersActions: PropTypes.object,
   users: PropTypes.array,
+  user: PropTypes.object,
   pagination: PropTypes.object
 };
 
-const mapStateToProps = ({ usersData }) => {
+const mapStateToProps = ({ usersData, user }) => {
   const { list, pagination } = usersData;
   return {
     users: list,
-    pagination
+    pagination,
+    user
   };
 };
 const mapDispatchProps = dispatch => {
-  return { usersActions: bindActionCreators(usersActions, dispatch) };
+  return {
+    usersActions: bindActionCreators(usersActions, dispatch),
+    userActions: bindActionCreators(userActions, dispatch)};
 };
 
 export default connect(

@@ -3,5 +3,5 @@ export default {
     list: [],
     pagination: null
   },
-  user: {}
+  user: null
 };
