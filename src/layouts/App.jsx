@@ -1,17 +1,17 @@
-import React from 'react';
-import { Switch, Route } from 'react-router-dom';
-import styled, { ThemeProvider } from 'styled-components';
-import Container from '@components/Container/Container';
-import Header from '@components/Header/Header';
-import Sidebar from '@components/Sidebar/Sidebar';
-import dashboardRoutes from '@routes/dashboard';
+import React from "react";
+import { Switch, Route } from "react-router-dom";
+import styled, { ThemeProvider } from "styled-components";
+import Container from "@components/Container/Container";
+import Header from "@components/Header/Header";
+import Sidebar from "@components/Sidebar/Sidebar";
+import dashboardRoutes from "@routes/dashboard";
 
 import theme from 'sass-extract-loader?{"plugins": ["sass-extract-js"]}!./../_variables.scss';
 
 const Wrapper = styled.div`
   position: relative;
   top: 0;
-  height: 100vh
+  height: 100vh;
 `;
 const MainPanel = styled.div`
   overflow: auto;
@@ -29,22 +29,20 @@ const Content = styled.div`
 
 const switchRoutes = (
   <Switch>
-      {
-        dashboardRoutes.map((prop, key) => {
-          return (
-            <Route 
-              exact={ prop.exact }
-              path={ prop.path } 
-              component={ prop.component } 
-              key={ key } 
-            />
-          )
-        })
-      }
-    </Switch>
+    {dashboardRoutes.map((prop, key) => {
+      return (
+        <Route
+          exact={prop.exact}
+          path={prop.path}
+          component={prop.component}
+          key={key}
+        />
+      );
+    })}
+  </Switch>
 );
 
-const App = (props) => {
+const App = props => {
   return (
     <ThemeProvider theme={theme}>
       <Wrapper>
@@ -54,9 +52,7 @@ const App = (props) => {
           <Header />
 
           <Content>
-            <Container>
-              {switchRoutes}
-            </Container>
+            <Container>{switchRoutes}</Container>
           </Content>
         </MainPanel>
       </Wrapper>

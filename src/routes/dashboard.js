@@ -81,7 +81,7 @@ const dashboardRoutes = [
   //   component: AsyncUsers
   // },
 
-  { redirect: true, path: "/", to: "/home", label: "Home" }
+  { redirect: true, path: "/", to: "/login", label: "Login" }
 ];
 
 export default dashboardRoutes;
