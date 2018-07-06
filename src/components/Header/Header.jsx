@@ -19,7 +19,7 @@ const Header = (props) => {
         <Toolbar className={classes.container}>
           <div className={classes.flex}>
             <Button color="inherit" href="#" className={classes.title}>
-              Header
+              Admin Portal
             </Button>
           </div>
         </Toolbar>

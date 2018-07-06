@@ -14,6 +14,11 @@ const AsyncUsers = Loadable({
   loader: () => import('@views/users/Users'),
   loading: Loading
 });
+const AsyncLogin = Loadable({
+  loader: () =>
+    import ('@views/login/Login'),
+  loading: Loading
+});
 
 const dashboardRoutes = [
   {
@@ -44,6 +49,15 @@ const dashboardRoutes = [
     icon: 'src/assets/images/sidebar/user-icon.png',
     activeIcon: 'src/assets/images/sidebar/user-icon-active.png',
     component: AsyncUsers
+  },
+  {
+    path: "/login",
+    exact: true,
+    protected: false,
+    displayLink: false,
+    label: null,
+    icon: null,
+    component: AsyncLogin
   },
   // {
   //   exact: true,

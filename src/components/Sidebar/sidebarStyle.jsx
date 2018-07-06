@@ -78,7 +78,7 @@ const sidebarStyle = theme => ({
     }
   },
   active: {
-    color: greenColor
+    color: "#43A047"
   },
   list: {
     marginTop: "20px",
@@ -139,8 +139,8 @@ const sidebarStyle = theme => ({
     [theme.breakpoints.up("md")]: {
       position: "absolute",
       width: "100%",
-      bottom: "13px",
-    },
+      bottom: "13px"
+    }
   }
 });
 

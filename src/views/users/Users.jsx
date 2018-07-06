@@ -6,13 +6,23 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import _ from "lodash";
 import cx from "classnames";
-import { Paper, InputLabel, Select, Input, MenuItem, FormControl } from "@material-ui/core";
+import {
+  Paper,
+  InputLabel,
+  Select,
+  Input,
+  MenuItem,
+  FormControl
+} from "@material-ui/core";
 import Container from "@components/Container/Container";
-import Table from "@components/Table/Table";
+import UsersList from "./components/list/UsersList";
 import { RaisedButton, SecondaryButton } from "@components/Button/Button";
 import SearchInput from "./components/search/SearchInput";
 import Dialog from "@components/Dialog/Dialog";
 import UserForm from "./components/form/UserForm";
+import Loading from "@components/Loading";
+import Waypoint from "react-waypoint";
+import queryString from "query-string";
 
 const UsersContainer = Container.extend`
   width: 960px;
@@ -39,29 +49,38 @@ const Toolbar = styled.div`
 const OrderingSelect = styled.div`
   & .users-order {
     display: flex;
+    align-items: center;
     position: relative;
     min-width: 200px;
     font-size: 12px;
+    .users-order-label {
+      padding: 8px 12px;
+      text-transform: uppercase;
+      width: 58px;
+    }
     .users-order-button {
       display: block;
-      min-width: 200px;
-      text-align: left;
+      min-width: 160px;
     }
   }
   & ul {
     display: none;
     position: absolute;
     top: 36px;
-    left: 0;
     right: 0;
     padding: 8px 0;
     list-style: none;
     z-index: 10;
     background: white;
-    box-shadow: ${props => props.theme.baseBoxShadow} 
-    > li {
+    width: 160px;
+    box-shadow: ${props => props.theme.baseBoxShadow};
+    & > li {
       padding: 12px 16px;
       cursor: pointer;
+      background: white;
+      &:hover {
+        background: rgba(0, 0, 0, 0.08);
+      }
     }
   }
 
@@ -72,22 +91,15 @@ const OrderingSelect = styled.div`
   }
 `;
 
-const PAGE_SIZE = 10;
-
 class Users extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      params: {
-        search: "",
-        ordering: null
-      },
-      pagination: {
-        page: 1,
-        page_size: PAGE_SIZE
-      },
-      openOrderingSelect: false
+      users: [],
+      listParams: {},
+      loading: false,
+      openSelect: false
     };
     this.handleClickOpen = this.handleClickOpen.bind(this);
     this.handleClickClose = this.handleClickClose.bind(this);
@@ -97,26 +109,46 @@ class Users extends Component {
     this.fetchUsers();
   }
 
-  updateParams(key, value) {
-    const { params } = this.state;
+  getListParams() {
+    const { listParams } = this.state;
+    let newParams = {};
 
-    if ([key] !== value) {
-      this.setState(
-        {
-          params: { ...params, [key]: value }
-        },
-        () => this.fetchUsers()
-      );
-    }
+    Object.keys(listParams).forEach(key => {
+      if (!_.isEmpty(listParams[key])) {
+        newParams[key] = listParams[key];
+      }
+    });
 
-    if (key === 'ordering') {
-      this.toggleOrderingSelect();
-    }
+    return newParams;
   }
 
   fetchUsers() {
-    const params = this.getParams();
-    this.props.usersActions.fetchUsers({ ...params });
+    const listParams = this.getListParams();
+
+    this.props.usersActions.fetchUsers(listParams);
+  }
+
+  updateListParams(key, value) {
+    let { listParams, users } = this.state;
+
+    if (!listParams[key] || listParams[key] !== value) {
+      if (key !== "page") {
+        listParams = { ...listParams, page: undefined };
+      }
+
+      this.setState(
+        {
+          loading: true,
+          listParams: { ...listParams, [key]: value }
+        },
+        () => {
+          this.fetchUsers();
+          this.setState({
+            loading: false
+          });
+        }
+      );
+    }
   }
 
   getOrderingOptions() {
@@ -131,44 +163,35 @@ class Users extends Component {
   }
 
   getOrderingLabel() {
-    const { ordering } = this.state.params;
-    const label = '';
+    const { ordering } = this.state.listParams;
+    let label = "Select an option";
 
-    if (!ordering) {
-      return 'Sort by';
+    if (!!ordering) {
+      label = this.getOrderingOptions().find(option => option.key === ordering)
+        .label;
     }
 
-    return this.getOrderingOptions()
-      .find(option => option.key === ordering)
-      .label;
+    return label;
   }
 
-  toggleOrderingSelect() {
+  toggleOrderingSelect(selected = null) {
     this.setState({
       openOrderingSelect: !this.state.openOrderingSelect
     });
-  }
 
-  getParams() {
-    const { params, pagination } = this.state;
-    const paramsData = { ...params, ...pagination };
-    let paramsObj = null;
-
-    Object.keys(paramsData).forEach(key => {
-      if (!_.isEmpty(paramsData[key])) {
-        paramsObj = { ...(paramsObj || {}), [key]: paramsData[key] };
-      }
-    });
-
-    return paramsObj;
+    if (!!selected) {
+      this.updateListParams("ordering", selected);
+    }
   }
 
   getName(user) {
+    let name = "";
+
     if (!!user) {
-      return `${user.first_name} ${user.last_name}`;
+      name = `${user.first_name} ${user.last_name}`;
     }
 
-    return "";
+    return name;
   }
 
   getGroups(user) {
@@ -178,19 +201,26 @@ class Users extends Component {
     return "";
   }
 
+  getTableCols() {
+    return [
+      { key: "name", label: "Name" },
+      { key: "email", label: "Email" },
+      { key: "groups", label: "Groups" }
+    ];
+  }
+
   getTableData(data) {
     return data.reduce((accum, current) => {
-      accum.push([
-        this.getName(current),
-        current.email,
-        this.getGroups(current)
-      ]);
+      accum.push({
+        id: current.url,
+        name: this.getName(current),
+        email: current.email,
+        groups: this.getGroups(current),
+      });
 
       return accum;
     }, []);
   }
-
-  filterUsers() {}
 
   handleClickOpen() {
     this.dialog.handleOpen();
@@ -205,27 +235,46 @@ class Users extends Component {
     return !!user ? `Edit User: ${user.name}` : `Create New User`;
   }
 
-  deleteUser(e) {
-    e.preventDefault();
-    alert(`User ${user.id} was deleted.`);
-    this.handleClickClose();
+  onPaginate() {
+    const { pagination } = this.props;
+    if (!!pagination.next) {
+      const parsedNextPageUrl = queryString.parseUrl(pagination.next);
+      this.updateListParams("page", parsedNextPageUrl.query.page || 1);
+    }
   }
 
-  saveUser() {
-    alert(`User ${user.id} was created.`);
-    this.handleClickClose();
+  getUserDetail(id) {
+    
   }
 
-  getUsersTable() {
-    const { users } = this.props;
+  renderUsersList() {
+    const { pagination, users } = this.props;
+
+    if (this.state.loading) {
+      return <Loading />;
+    }
 
     if (!!users && Array.isArray(users) && users.length) {
-      return (
-        <Table
-          tableCols={["Name", "Email", "Role"]}
-          tableData={this.getTableData(users)}
-        />
-      );
+      const waypointComponent =
+        !!pagination && !!pagination.next ? (
+          <Waypoint
+            className="users-list_waypoint"
+            onEnter={this.onPaginate.bind(this)}
+            key="waypoint"
+          >
+            <Loading />
+          </Waypoint>
+        ) : null;
+
+      return [
+        <UsersList
+          cols={this.getTableCols()}
+          data={this.getTableData(users)}
+          onUserClick={this.getUserDetail.bind(this)}
+          key="userList"
+        />,
+        waypointComponent
+      ];
     }
 
     return null;
@@ -248,7 +297,6 @@ class Users extends Component {
   }
 
   render() {
-    const { users } = this.props;
     const orderingOptions = this.getOrderingOptions();
     const orderingLabel = this.getOrderingLabel();
 
@@ -256,24 +304,33 @@ class Users extends Component {
       <UsersContainer>
         <Title>Users</Title>
         <Toolbar>
-          <SearchInput onSearch={this.updateParams.bind(this)} />
+          <SearchInput onSearch={this.updateListParams.bind(this)} />
 
           <OrderingSelect>
-            <div className={ cx('users-order', { active: this.state.openOrderingSelect }) }>
-              <SecondaryButton className='users-order-button' onClick={() => this.toggleOrderingSelect()}>
-                { orderingLabel }
+            <div
+              className={cx("users-order", {
+                active: this.state.openOrderingSelect
+              })}
+            >
+              <span className="users-order-label">Sort by:</span>
+              <SecondaryButton
+                className="users-order-button"
+                onClick={() => this.toggleOrderingSelect()}
+              >
+                {orderingLabel}
               </SecondaryButton>
 
-              <ul className='users-order-select'>
-                {
-                  orderingOptions.map(option => {
-                    return (
-                      <li key={option.key} onClick={() => this.updateParams('ordering', option.key)}>
-                        {option.label}
-                      </li>
-                    );
-                  })
-                }
+              <ul className="users-order-select">
+                {orderingOptions.map(option => {
+                  return (
+                    <li
+                      key={option.key}
+                      onClick={() => this.toggleOrderingSelect(option.key)}
+                    >
+                      {option.label}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </OrderingSelect>
@@ -283,7 +340,7 @@ class Users extends Component {
           </RaisedButton>
         </Toolbar>
 
-        <Paper>{this.getUsersTable()}</Paper>
+        <Paper>{this.renderUsersList()}</Paper>
 
         {this.getUserFormDialog()}
       </UsersContainer>
@@ -293,12 +350,15 @@ class Users extends Component {
 
 Users.propTypes = {
   usersActions: PropTypes.object,
-  users: PropTypes.array
+  users: PropTypes.array,
+  pagination: PropTypes.object
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = ({ usersData }) => {
+  const { list, pagination } = usersData;
   return {
-    users: state.users
+    users: list,
+    pagination
   };
 };
 const mapDispatchProps = dispatch => {

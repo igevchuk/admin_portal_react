@@ -1,4 +1,7 @@
 export default {
-  users: [],
+  users: {
+    list: [],
+    pagination: null
+  },
   user: {}
 };
