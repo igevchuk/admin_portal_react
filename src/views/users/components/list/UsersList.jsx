@@ -1,61 +1,132 @@
-import React from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import {
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell
-} from "@material-ui/core";
+import { TableCell } from "@material-ui/core";
+import Table from "@components/Table/Table";
+import TableSortLabel from "@material-ui/core/TableSortLabel";
 
-const UsersList = styled.div`
-  & table tbody tr {
-    background: #FFFFFF;
-    transition: background 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+const styles = { row: { cursor: "pointer" } };
+const TableHeaderCell = styled.th`
+  & > span {
     cursor: pointer;
+    position: relative;
     &:hover {
-      background: rgba(0, 0, 0, 0.08);
+      color: ${props => props.theme.baseFontColor};
+    }
+    & > span {
+      color: inherit;
+      position: absolute;
     }
   }
 `;
 
-UsersList.propTypes = {
-  cols: PropTypes.arrayOf(PropTypes.object),
-  data: PropTypes.arrayOf(PropTypes.object).isRequired
-};
+class UsersList extends Component {
+  constructor(props) {
+    super(props);
+    this.orderUsers = this.orderUsers.bind(this);
+  }
 
-export default ({ ...props }) => {
-  const { cols, data } = props;
-  return (
-    <UsersList className="users-list" {...props}>
-      <Table>
-        {!!cols && cols.length > 0 ? (
-          <TableHead>
-            <TableRow>
-              {cols.map(col => {
-                return (
-                  <TableCell key={col.key}>
-                    {col.label}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          </TableHead>
-        ) : null}
+  getOrderingOptions() {
+    return {
+      first_name: { asc: "-first_name", desc: "first_name" },
+      last_name: { asc: "-last_name", desc: "last_name" },
+      email: { asc: "-email", desc: "email" }
+    };
+  }
 
-        <TableBody>
+  orderUsers(key) {
+    const orderingOptions = this.getOrderingOptions();
+    const { orderBy } = this.props;
+
+    let direction;
+    if (!orderBy) {
+      direction = 'desc';
+    } else if (key === orderBy) {
+      direction = 'asc';
+    } else {
+      direction = 'desc';
+    }
+
+    this.setState(
+      {
+        direction,
+        order: orderingOptions[key]
+      },
+      () => {
+        this.props.onSort("ordering", orderingOptions[key][direction]);
+      }
+    );
+  }
+
+  _renderSortLabel(key) {
+    const orderingOptions = this.getOrderingOptions();
+    const direction = this.state ? this.state.direction : 'desc';
+    const { orderBy } = this.props;
+    console.log(direction)
+    if (!!orderBy && orderBy.replace('-', '') === key) {
+      return <TableSortLabel active={true} direction={direction} />;            
+    }
+
+    return null;
+
+  }
+
+  render() {
+    const { styles, data } = this.props;
+    const direction = this.state ? this.state.direction : 'desc';
+
+    return (
+      <Table className="users-list" styles={styles}>
+        <thead>
+          <tr>
+            <TableHeaderCell sortDirection={direction} width="20%">
+              <span onClick={() => this.orderUsers("first_name")}>
+                First Name
+                {this._renderSortLabel("first_name")}
+              </span>
+            </TableHeaderCell>
+
+            <TableHeaderCell width="25%">
+              <span onClick={() => this.orderUsers("last_name")}>
+                Last Name
+                {this._renderSortLabel("last_name")}
+              </span>
+            </TableHeaderCell>
+
+            <TableHeaderCell with="25%">
+              <span onClick={() => this.orderUsers("email")}>
+                Email
+                {this._renderSortLabel("email")}
+              </span>
+            </TableHeaderCell>
+
+            <TableHeaderCell with="30%">Groups</TableHeaderCell>
+          </tr>
+        </thead>
+
+        <tbody>
           {data.map(row => {
             return (
-              <TableRow key={row.id}>
-                <TableCell key="name" onClick={() => props.onUserClick(row.id)}>{row.name}</TableCell>
-                <TableCell key="email">{row.email}</TableCell>
-                <TableCell key="groups">{row.groups}</TableCell>
-              </TableRow>
+              <tr key={row.id} onClick={() => this.props.onUserClick(row.id)}>
+                <td key="first_name">{row.first_name}</td>
+
+                <td key="last_name">{row.last_name}</td>
+
+                <td key="email">{row.email}</td>
+
+                <td key="groups">{row.groups}</td>
+              </tr>
             );
           })}
-        </TableBody>
+        </tbody>
       </Table>
-    </UsersList>
-  );
+    );
+  }
 }
+
+UsersList.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onUserClick: PropTypes.func
+};
+
+export default UsersList;

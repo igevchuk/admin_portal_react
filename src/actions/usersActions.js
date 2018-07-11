@@ -20,7 +20,7 @@ function fetchPaginatedUsersSuccess({ list, pagination }) {
 }
 
 function fetchUsersFailed(err) {
-  alert(err);
+  console.error(err);
 };
 
 function fetchUsers(params) { 
@@ -44,7 +44,7 @@ function fetchUsers(params) {
         if (!!json && !!json.results) {
           const payload = normalizeUsersData(json);
 
-          if (!!params.page) {
+          if (!!params && !!params.page) {
             dispatch(fetchPaginatedUsersSuccess(payload))
           } else {
             dispatch(fetchUsersSuccess(payload));

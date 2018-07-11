@@ -9,8 +9,11 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 export default class BaseDialog extends Component {
   constructor(props) {
     super(props);
+    
+    this.state = {
+      open: false
+    };
   }
-
   handleOpen = () => {
     this.setState({ open: true });
   };
@@ -22,15 +25,10 @@ export default class BaseDialog extends Component {
   render() {
     const { dialogTitle } = this.props;
 
-    return (
-      <Dialog
-        open={this.props.open}
-        onClose={this.handleClose}
-        aria-labelledby="form-dialog-title"
-      >
-        {!!dialogTitle && (
-          <DialogTitle id="form-dialog-title">{dialogTitle}</DialogTitle>
-        )}
+    return <Dialog open={this.state.open} onClose={this.handleClose} aria-labelledby="form-dialog-title">
+        {!!dialogTitle && <DialogTitle id="form-dialog-title">
+            {dialogTitle}
+          </DialogTitle>}
 
         <DialogContent>
           {this.props.children}
@@ -45,7 +43,6 @@ export default class BaseDialog extends Component {
             Subscribe
           </Button>
         </DialogActions> */}
-      </Dialog>
-    );
+      </Dialog>;
   }
 }

@@ -1,38 +1,53 @@
+import React from "react";
+import propTypes from "prop-types";
 import styled from "styled-components";
+import classes from "classnames";
 
 const Button = styled.button`
-  background: transparent;
   padding: 8px 16px;
-  min-width: 88px;
   min-height: 36px;
+  min-width: 88px;
   border-radius: 3px;
-  line-height: 0;
   text-align: center;
-  text-transform: uppercase;
-  font-size: ${props => props.theme.baseFontSize}
+  font-size: ${props => props.theme.baseFontSize};
   font-weight: ${props => props.theme.fontLight};
   box-shadow: ${props => props.theme.buttonBoxShadow};
   border: none;
-  &:hover {
-    cursor: pointer;
-  }
+  cursor: pointer;
   &:focus {
     outline: none;
   }
+  &.primary-btn {
+    background: ${props => props.theme.primaryButton};
+    color: #FFFFFF;
+  }
+  &.secondary-btn {
+    background: ${props => props.theme.secondaryButton};
+    color: ${props => props.theme.baseFontColor}
+  }
 `;
 
-const RaisedButton = Button.extend`
-  background: ${props => props.theme.raisedButton};
-  color: ${props => props.theme.white};
-`;
+export default ({ ...props }) => {
+  function getClassName(color) {
+    switch (color) {
+      case "primary":
+        return "primary-btn";
+      case "secondary":
+        return "secondary-btn";
+      default:
+        return "primary-btn";
+    }
+  }
 
-const SecondaryButton = Button.extend`
-  background: ${props => props.theme.secondaryButton};
-  color: ${props => props.theme.baseFontColor};
-`;
+  return (
+    <Button {...props} className={classes(["btn", getClassName(props.color), props.className])}>
+      {props.children}
+    </Button>
+  );
+};
 
-export {
-  Button,
-  RaisedButton,
-  SecondaryButton
+Button.propTypes = {
+  children: propTypes.oneOfType([propTypes.element, propTypes.string]),
+  color: propTypes.string,
+  className: propTypes.string
 };

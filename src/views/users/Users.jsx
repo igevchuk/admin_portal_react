@@ -4,22 +4,14 @@ import { bindActionCreators } from "redux";
 import * as usersActions from "@actions/usersActions";
 import * as userActions from "@actions/userActions";
 
-import PropTypes from "prop-types";
+import propTypes from "prop-types";
 import styled from "styled-components";
 import _ from "lodash";
 import cx from "classnames";
-import {
-  Paper,
-  InputLabel,
-  Select,
-  Input,
-  MenuItem,
-  FormControl
-} from "@material-ui/core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Paper } from "@material-ui/core";
 import Container from "@components/Container/Container";
 import UsersList from "./components/list/UsersList";
-import { RaisedButton, SecondaryButton } from "@components/Button/Button";
+import Button from "@components/Button/Button";
 import SearchInput from "./components/search/SearchInput";
 import Dialog from "@components/Dialog/Dialog";
 import UserForm from "./components/form/UserForm";
@@ -50,51 +42,6 @@ const Toolbar = styled.div`
   align-items: flex-end;
   align-content: flex-end;
 `;
-const OrderingSelect = styled.div`
-  & .users-order {
-    display: flex;
-    align-items: center;
-    position: relative;
-    min-width: 200px;
-    font-size: 12px;
-    color: ${props => props.theme.brandGrey};
-    .users-order-label {
-      padding: 8px 12px;
-    }
-    .users-order-button {
-      display: block;
-      min-width: 160px;
-      text-align: left;
-    }
-  }
-  & ul {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 0;
-    padding: 8px 0;
-    list-style: none;
-    z-index: 10;
-    background: white;
-    width: 160px;
-    box-shadow: ${props => props.theme.baseBoxShadow};
-    & > li {
-      padding: 12px 16px;
-      cursor: pointer;
-      background: white;
-      transition: background 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-      &:hover {
-        background: rgba(0, 0, 0, 0.08);
-      }
-    }
-  }
-
-  & .active {
-    & ul {
-      display: block;
-    }
-  }
-`;
 
 class Users extends Component {
   constructor(props) {
@@ -107,8 +54,10 @@ class Users extends Component {
       openSelect: false,
       openDialog: false
     };
-    this.handleClickOpen = this.handleClickOpen.bind(this);
-    this.handleClickClose = this.handleClickClose.bind(this);
+
+    this.saveUser = this.saveUser.bind(this);
+    this.createUser = this.createUser.bind(this);
+    this.closeDialog = this.closeDialog.bind(this);
   }
 
   componentDidMount() {
@@ -131,7 +80,7 @@ class Users extends Component {
   fetchUsers() {
     const listParams = this.getListParams();
 
-    this.props.usersActions.fetchUsers(listParams);
+    this.props.fetchUsers(listParams);
   }
 
   updateListParams(key, value) {
@@ -157,37 +106,14 @@ class Users extends Component {
     }
   }
 
-  getOrderingOptions() {
-    return [
-      { label: "First Name (A-Z)", key: "first_name", order: "desc" },
-      { label: "Last Name (A-Z)", key: "last_name", order: "desc" },
-      { label: "Email (A-Z)", key: "email", order: "desc" },
-      { label: "First Name (Z-A)", key: "-first_name", order: "asc" },
-      { label: "Last Name (Z-A)", key: "-last_name", order: "asc" },
-      { label: "Email (Z-A)", key: "-email", order: "asc" }
-    ];
-  }
+  getDirection() {
+    const { listParams } = this.state;
 
-  getOrderingLabel() {
-    const { ordering } = this.state.listParams;
-    let label = "Select an option";
-
-    if (!!ordering) {
-      label = this.getOrderingOptions().find(option => option.key === ordering)
-        .label;
-    }
-
-    return label;
-  }
-
-  toggleOrderingSelect(selected = null) {
-    this.setState({
-      openOrderingSelect: !this.state.openOrderingSelect
-    });
-
-    if (!!selected) {
-      this.updateListParams("ordering", selected);
-    }
+    return !!listParams &&
+      !!listParams.ordering &&
+      listParams.ordering.charAt(0) === "-"
+      ? "asc"
+      : "desc";
   }
 
   getName(user) {
@@ -218,24 +144,13 @@ class Users extends Component {
   getTableData(data) {
     return data.reduce((accum, current) => {
       accum.push({
+        ...current,
         id: current.url,
-        name: this.getName(current),
-        email: current.email,
         groups: this.getGroups(current)
       });
 
       return accum;
     }, []);
-  }
-
-  handleClickOpen() {
-    this.dialog.handleOpen();
-  }
-
-  handleClickClose(e) {
-    e.preventDefault();
-
-    this.dialog.handleClose();
   }
 
   getDialogTitle() {
@@ -251,14 +166,23 @@ class Users extends Component {
     }
   }
 
-  getUserDetail(id = null) {
-    if (!!id) {
-      this.props.userActions.fetchUser(id);
+  getUserDetail(url = null) {
+    if (!!url) {
+      this.props.fetchUser(url);
+      if (!this.props.userIsLoading) {
+        this.dialog.handleOpen();
+      }
+    } else {
+      this.dialog.handleOpen();
     }
-    
-    this.setState({
-      openDialog: true
-    });
+  }
+
+  closeDialog(reload = false) {
+    this.dialog.handleClose();
+    // this.props.userActions.resetUser();
+    if (reload) {
+      this.fetchUsers();
+    }
   }
 
   renderUsersList() {
@@ -282,9 +206,12 @@ class Users extends Component {
 
       return [
         <UsersList
-          cols={this.getTableCols()}
+          className="users-list"
           data={this.getTableData(users)}
           onUserClick={this.getUserDetail.bind(this)}
+          orderBy={this.state.listParams.ordering}
+          onSort={this.updateListParams.bind(this)}
+          direction={this.getDirection()}
           key="userList"
         />,
         waypointComponent
@@ -294,65 +221,51 @@ class Users extends Component {
     return null;
   }
 
+  saveUser(formData, url) {
+    this.props.saveUser(formData, url);
+  }
+
+  createUser(formData) {
+    this.props.userActions.createUser(formData);
+  }
+
   getUserFormDialog() {
     return (
       <Dialog
+        className="users-user_dialog"
         ref={dialog => (this.dialog = dialog)}
-        open={this.state.openDialog}
         dialogTitle={this.getDialogTitle()}
       >
-        <UserForm handleClose={this.handleClickClose} user={this.props.user} />
+        <UserForm
+          className="users-user_dialog_form"
+          closeDialog={this.closeDialog}
+          onSave={this.saveUser}
+          onCreate={this.createUser}
+          user={this.props.user}
+          error={this.props.userErrors}
+          saveErrors={this.props.saveUserErrors}
+        />
       </Dialog>
     );
   }
 
   render() {
-    const orderingOptions = this.getOrderingOptions();
-    const orderingLabel = this.getOrderingLabel();
-
     return (
-      <UsersContainer>
-        <Title>Users</Title>
-        <Toolbar>
-          <SearchInput onSearch={this.updateListParams.bind(this)} />
+      <UsersContainer className="users">
+        <Title className="users-heading">Users</Title>
+        <Toolbar className="users-toolbar">
+          <SearchInput
+            className="users-toolbar_search"
+            onSearch={this.updateListParams.bind(this)}
+          />
 
-          <OrderingSelect>
-            <div
-              className={cx("users-order", {
-                active: this.state.openOrderingSelect
-              })}
-            >
-              <span className="users-order-label">Sort by:</span>
-              <SecondaryButton
-                className="users-order-button"
-                onClick={() => this.toggleOrderingSelect()}
-              >
-                {orderingLabel}
-              </SecondaryButton>
-
-              <EscapeOutside
-                open={this.state.openOrderingSelect}
-                onClickOutside={this.toggleOrderingSelect.bind(this)}
-              >
-                <ul className="users-order-select">
-                  {orderingOptions.map(option => {
-                    return (
-                      <li
-                        key={option.key}
-                        onClick={() => this.toggleOrderingSelect(option.key)}
-                      >
-                        {option.label}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </EscapeOutside>
-            </div>
-          </OrderingSelect>
-
-          <RaisedButton size="medium" onClick={() => this.getUserDetail()}>
-            Create User
-          </RaisedButton>
+          <Button
+            className="users-toolbar_create"
+            color="primary"
+            onClick={() => this.getUserDetail()}
+          >
+            CREATE USER
+          </Button>
         </Toolbar>
 
         <Paper>{this.renderUsersList()}</Paper>
@@ -364,24 +277,29 @@ class Users extends Component {
 }
 
 Users.propTypes = {
-  usersActions: PropTypes.object,
-  users: PropTypes.array,
-  user: PropTypes.object,
-  pagination: PropTypes.object
+  usersActions: propTypes.object,
+  users: propTypes.array,
+  user: propTypes.object,
+  pagination: propTypes.object
 };
 
-const mapStateToProps = ({ usersData, user }) => {
+const mapStateToProps = ({ usersData, ...rest }) => {
   const { list, pagination } = usersData;
+  const { user, userIsLoading, userErrors, saveUserErrors } = rest;
   return {
     users: list,
     pagination,
-    user
+    user,
+    userIsLoading,
+    userErrors,
+    saveUserErrors
   };
 };
 const mapDispatchProps = dispatch => {
   return {
-    usersActions: bindActionCreators(usersActions, dispatch),
-    userActions: bindActionCreators(userActions, dispatch)
+    fetchUsers: params => dispatch(usersActions.fetchUsers(params)),
+    fetchUser: url => dispatch(userActions.fetchUser(url)),
+    saveUser: (data, url) => dispatch(userActions.saveUser(data, url))
   };
 };
 

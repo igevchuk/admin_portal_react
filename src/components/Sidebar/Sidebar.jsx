@@ -27,7 +27,7 @@ const List = styled.ul`
     }
     & span {
       font-size: ${props => props.theme.baseFontSize};
-      color: ${props => props.theme.brandGrey};
+      color: ${props => props.theme.brandGray};
       padding: 0 16px;
       font-weight: ${props => props.theme.fontLight};
       line-height: 30px;

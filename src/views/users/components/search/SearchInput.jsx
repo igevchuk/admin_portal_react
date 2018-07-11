@@ -9,11 +9,11 @@ const StyledTextField = styled(TextField)`
   }
   input {
     font-size: ${props => props.theme.baseFontSize};
-    color: ${props => props.theme.brandGrey};
+    color: ${props => props.theme.brandGray};
     font-weight: ${props => props.theme.fontWeight};
   }
   & .search-input_andornment {
-    color: ${props => props.theme.brandGrey};
+    color: ${props => props.theme.brandGray};
     font-size: 12px;
     & svg {
       font-size: 20px;

@@ -2,6 +2,10 @@ export default {
   users: {
     list: [],
     pagination: null
-  },
-  user: null
+  }, 
+  user: null,
+  userIsLoading: false,
+  userErrors: null,
+  userIsSaving: false,
+  saveUserErrors: null
 };

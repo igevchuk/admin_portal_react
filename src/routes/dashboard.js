@@ -1,4 +1,5 @@
 import Loadable from 'react-loadable';
+import Users from "@views/users/Users";
 
 import Loading from '@components/Loading';
 
@@ -48,7 +49,7 @@ const dashboardRoutes = [
     label: "Users",
     icon: 'src/assets/images/sidebar/user-icon.png',
     activeIcon: 'src/assets/images/sidebar/user-icon-active.png',
-    component: AsyncUsers
+    component: Users
   },
   {
     path: "/login",

@@ -3,7 +3,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: "development",
-  entry: './src/index.js',
+  entry: ['babel-polyfill', './src/index.js'],
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'main.js',
@@ -50,7 +50,8 @@ module.exports = {
       "@assets": path.resolve(__dirname, "src/assets/"),
       "@jss": path.resolve(__dirname, "src/assets/jss/"),
       "@images": path.resolve(__dirname, "src/assets/images/"),
-      "@actions": path.resolve(__dirname, "src/actions")
+      "@actions": path.resolve(__dirname, "src/actions"),
+      "@services": path.resolve(__dirname, "src/services")
     }
   },
   devServer: {
